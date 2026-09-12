@@ -244,7 +244,7 @@ Budgetbuddy/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/budgetbuddy.git
+git clone https://github.com/psprashanth25/budgetbuddy.git
 cd budgetbuddy
 ```
 
@@ -404,9 +404,8 @@ To customize the README preview gallery with your own screenshots:
 ## 13. Author
 
 **P. S. Prashanth**  
-- **GitHub**: [github.com/your-username](https://github.com)  
-- **LinkedIn**: [linkedin.com/in/your-profile](https://linkedin.com)  
-- **Project Repository**: [BudgetBuddy](https://github.com/your-username/budgetbuddy)
+- **GitHub**: [github.com/psprashanth25](https://github.com/psprashanth25)  
+- **Project Repository**: [BudgetBuddy](https://github.com/psprashanth25/budgetbuddy)
 
 ---
 
