@@ -12,8 +12,7 @@ Traditional budgeting tools are overly complex, enterprise-focused, or assume fi
 
 ```
 docs/screenshots/
-├── login.png                 # Sign In with quick demo access
-├── register.png              # Registration & 6-digit Email OTP Verification
+├── login.png                 # Sign In & 6-Digit Email OTP Verification
 ├── dashboard.png             # Live Financial Ledger Cards & Analytics Mode
 ├── expenses.png              # Expense Ledger with search, sorting & category filtering
 ├── categories.png            # Multi-level category hierarchy & management
@@ -37,8 +36,6 @@ docs/screenshots/
 | :---: | :---: |
 | ![Reports & Audit Trail](docs/screenshots/reports.png) | ![Generated PDF Statement](docs/screenshots/financial-statement.png) |
 | *Interactive category distribution & monthly audit trail* | *Executive-grade A4 printable financial statement* |
-
-*(See [Screenshot Preparation Guide](#screenshot-capture-guide) below to populate the preview images).*
 
 ---
 
@@ -372,23 +369,15 @@ node verify_budgetbuddy.js
 
 ---
 
-## 11. Screenshot Capture Guide
+## 11. Application Preview Reference
 
-To customize the README preview gallery with your own screenshots:
-
-1. Create the screenshots directory:
-   ```bash
-   mkdir -p docs/screenshots
-   ```
-2. Start the application locally and capture the following screens at **1280x800** or **1920x1080** resolution:
-   - `login.png`: Navigate to `/login` (show the dark theme card and demo button).
-   - `register.png`: Navigate to `/register` (show the registration / OTP modal).
-   - `dashboard.png`: Navigate to `/` (show metric cards and mode badge).
-   - `expenses.png`: Navigate to `/expenses` (show line items and category filters).
-   - `categories.png`: Navigate to `/categories` (show the category tree).
-   - `reports.png`: Navigate to `/reports` (show Recharts graphs and audit trail table).
-   - `financial-statement.png`: Open a downloaded statement PDF in your PDF viewer.
-3. Save each image with the corresponding filename in `docs/screenshots/`.
+The GitHub README preview gallery showcases 6 high-resolution production views captured directly from the live application:
+- `login.png`: Dual-panel showcase featuring dark-theme credential sign-in and 6-digit email OTP verification.
+- `dashboard.png`: Full financial command center displaying real-time bank balance, pocket money metrics, spending forecasts, Recharts visualizations, and recent transactions.
+- `expenses.png`: Searchable student expense ledger with instant category filtering, sorting controls, and inline actions.
+- `categories.png`: Hierarchical category management displaying default protected taxonomies and custom subcategory trees.
+- `reports.png`: Comprehensive monthly report view with category donut distributions, 12-month spending trends, statement line items, and the historical monthly audit trail.
+- `financial-statement.png`: Executive-grade A4 financial statement document reconciled against live bank balance and verified transactions, ready for printing.
 
 ---
 
