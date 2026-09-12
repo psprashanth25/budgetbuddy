@@ -2,15 +2,37 @@
 
 > A modern, full-stack personal finance and pocket-money management web application tailored for hostel and college students.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-success?style=for-the-badge&logo=vercel)](https://budgetbuddy-khaki-nine.vercel.app)
+[![Backend API](https://img.shields.io/badge/Backend%20API-Render-informational?style=for-the-badge&logo=render)](https://budgetbuddy-sh3s.onrender.com/)
+[![Database](https://img.shields.io/badge/Database-MongoDB%20Atlas-green?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/atlas)
+[![Automated Tests](https://img.shields.io/badge/Tests-42%20Passing-brightgreen?style=for-the-badge)](backend/verify_budgetbuddy.js)
+[![License: ISC](https://img.shields.io/badge/License-ISC-orange?style=for-the-badge)](LICENSE)
+
 BudgetBuddy is a full-stack MERN application engineered to solve the real-world financial challenges faced by students living in hostels and university accommodations. Managing personal finances in a hostel environment requires balancing irregular pocket money transfers from parents, recurring monthly living costs, unexpected campus expenses, and maintaining a reliable bank balance buffer without overdrafting.
 
-Traditional budgeting tools are overly complex, enterprise-focused, or assume fixed monthly corporate salaries. BudgetBuddy introduces a student-centric financial ledger model featuring dual-mode analytics (Pocket Money tracking vs. Total Bank Balance protection), hierarchical expense categorization, date-restricted entry validation, and automated PDF statement generation.
+Traditional budgeting tools are overly complex, enterprise-focused, or assume fixed monthly corporate salaries. BudgetBuddy introduces a student-centric financial ledger model featuring dual-mode analytics (Pocket Money tracking vs. Total Bank Balance protection), hierarchical expense categorization, date-restricted entry validation, and automated client-side PDF statement generation.
 
 ---
 
-## 1. Project Preview
+## 1. Live Demo & Deployed Services
 
-```
+The application is deployed to production:
+
+| Service | Platform | Link | Description |
+| :--- | :--- | :--- | :--- |
+| **Frontend Web App** | **Vercel** | [https://budgetbuddy-khaki-nine.vercel.app](https://budgetbuddy-khaki-nine.vercel.app) | Live, production React application. Open this URL in any browser to use the full application. |
+| **Backend REST API** | **Render** | [https://budgetbuddy-sh3s.onrender.com](https://budgetbuddy-sh3s.onrender.com) | Express.js API powering authentication, ledger math, categories, budgets, and reporting. |
+| **API Health Check** | **Render** | [https://budgetbuddy-sh3s.onrender.com/](https://budgetbuddy-sh3s.onrender.com/) | Live service monitor verifying API uptime, MongoDB Atlas connection, and SMTP readiness. |
+| **Database Cluster** | **MongoDB Atlas** | Cloud Replica Set | Cloud-hosted MongoDB cluster storing users, categories, expenses, and monthly records. |
+
+> [!NOTE]
+> **API Route Behavior**: The root URL `https://budgetbuddy-sh3s.onrender.com/` serves as the official API health check and returns a JSON status report. Opening `/api` directly in a browser will return `{"success":false,"message":"Route /api not found"}`. This is expected because `/api` is an endpoint namespace prefix, not a standalone route. Individual REST resources reside under subpaths such as `/api/auth`, `/api/expenses`, `/api/categories`, `/api/reports`, and `/api/dashboard`.
+
+---
+
+## 2. Project Preview
+
+```text
 docs/screenshots/
 ├── login.png                 # Sign In & 6-Digit Email OTP Verification
 ├── dashboard.png             # Live Financial Ledger Cards & Analytics Mode
@@ -39,7 +61,200 @@ docs/screenshots/
 
 ---
 
-## 2. Key Features
+## 3. How to Use the Live Project
+
+1. **Open the Live Web Application**:
+   Navigate to [https://budgetbuddy-khaki-nine.vercel.app](https://budgetbuddy-khaki-nine.vercel.app).
+2. **Access Your Account**:
+   - **Demo Access**: On the Sign In page, click **"Use Demo Account (aman@hostel.edu)"** to immediately prefill demo credentials (`password123`) and explore pre-seeded hostel expenses.
+   - **New Registration**: Click **"Register now"**, enter your name, email, and password. A 6-digit OTP code will be sent to your email for account activation.
+3. **Set Up Opening Balances**:
+   On your first visit, set your initial **Current Bank Balance** (representing your actual funds across savings and cash).
+4. **Allocate Monthly Pocket Money**:
+   When a new month starts, enter that month's pocket money allowance. The entered funds credit dynamically to your total bank balance.
+5. **Manage Daily Expenses**:
+   Record hostel expenses (Mess food, Tea, College supplies, Wi-Fi, Travel) with date validation (future dates are strictly blocked) and note descriptions.
+6. **Analyze & Export Reports**:
+   Visit the **Reports** section to view interactive Recharts breakdowns, verify the historical audit trail, or click **"Download PDF"** to generate an official printable A4 statement.
+
+The live application is fully connected to the deployed Render backend and live MongoDB Atlas cluster.
+
+---
+
+## 4. Deployment Architecture
+
+BudgetBuddy utilizes a modern, decoupled cloud architecture designed for high availability, zero server maintenance, and fast global delivery:
+
+```mermaid
+flowchart LR
+    subgraph Client["Client Browser"]
+        SPA["React 19 SPA (Vite)<br/>Tailwind CSS & Recharts"]
+    end
+
+    subgraph Hosting["Global CDN Hosting"]
+        Vercel["Vercel Edge Network<br/>budgetbuddy-khaki-nine.vercel.app"]
+    end
+
+    subgraph Backend["Cloud Web Service"]
+        Render["Render Web Service<br/>Node.js 20+ & Express.js 5<br/>budgetbuddy-sh3s.onrender.com"]
+    end
+
+    subgraph Database["Database Cluster"]
+        Atlas[("MongoDB Atlas Cloud<br/>Replica Set Cluster")]
+    end
+
+    subgraph Email["Outbound SMTP"]
+        SMTP["Gmail SMTP / Nodemailer<br/>TLS Port 587 (OTP Delivery)"]
+    end
+
+    SPA -->|HTTPS / Static Assets| Vercel
+    SPA -->|REST API Requests with Bearer JWT| Render
+    Render -->|Mongoose Queries| Atlas
+    Render -->|Dispatches 6-Digit OTPs| SMTP
+```
+
+- **Frontend (Vercel)**: React 19 single-page application built with Vite and hosted on Vercel's global edge network for sub-second page delivery and instant routing. Communicates with the backend exclusively via HTTPS REST API calls configured via `VITE_API_URL`.
+- **Backend (Render)**: Express 5 API running in a containerized Linux environment on Render. Handles business logic, JWT authentication, ledger calculations, and CORS validation.
+- **Database (MongoDB Atlas)**: Managed MongoDB cloud database with automated backups, replica sets, connection pooling, and SSL/TLS encryption in transit.
+- **Email Delivery (Nodemailer)**: SMTP transporter connecting via TLS on port 587 to send account activation OTPs and single-use password reset links.
+
+---
+
+## 5. Deployment Details & Configuration
+
+### Platform Specifications
+
+| Component | Platform | Configuration / Setting | Value |
+| :--- | :--- | :--- | :--- |
+| **Frontend** | Vercel | Framework Preset | `Vite` |
+| | | Build Command | `npm run build` |
+| | | Output Directory | `dist` |
+| | | Install Command | `npm install` |
+| | | Production Domain | `https://budgetbuddy-khaki-nine.vercel.app` |
+| **Backend** | Render | Environment | `Node` |
+| | | Build Command | `npm install` |
+| | | Start Command | `npm start` (`node server.js`) |
+| | | Entrypoint File | `server.js` |
+| | | Port Binding | Listens dynamically on `process.env.PORT || 5000` bound to `0.0.0.0` |
+| | | Production Domain | `https://budgetbuddy-sh3s.onrender.com` |
+| **Database** | MongoDB Atlas | Cluster Tier | Shared Cloud Cluster (`M0 / Replica Set`) |
+| | | Driver / Protocol | `mongodb+srv://` with TLS 1.2+ encryption |
+
+---
+
+## 6. Environment Variables Reference
+
+To protect sensitive credentials, **never commit real `.env` files to GitHub**. Configure actual values securely in the Vercel and Render management dashboards.
+
+### Frontend Environment Variables (Vercel)
+
+Set in **Vercel Project Settings &rarr; Environment Variables**:
+
+```env
+# URL pointing to the deployed backend REST API
+VITE_API_URL=<deployed-backend-api-url>
+```
+
+*Example for production:*
+```env
+VITE_API_URL=https://budgetbuddy-sh3s.onrender.com/api
+```
+
+### Backend Environment Variables (Render)
+
+Set in **Render Web Service &rarr; Environment**:
+
+```env
+# Server Port (assigned automatically by Render, defaults to 5000)
+PORT=5000
+
+# MongoDB Atlas Connection String
+MONGO_URI=<mongodb-atlas-connection-string>
+
+# JWT Secret Key for signing authentication tokens
+JWT_SECRET=<your-jwt-secret>
+
+# Allowed Frontend Origin for CORS (must match your Vercel URL without trailing slash)
+CLIENT_URL=<deployed-frontend-url>
+
+# Nodemailer Outbound SMTP Settings
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=<your-email>
+EMAIL_PASS=<your-gmail-app-password>
+EMAIL_FROM=<your-email>
+```
+
+> [!IMPORTANT]
+> **Production Secrets Policy**:
+> - Never expose real passwords, Google App Passwords, MongoDB connection URIs, or JWT secrets in public repositories.
+> - In development, store local secrets in `backend/.env` and `frontend/.env`, both of which are strictly excluded from version control via `.gitignore`.
+> - In production, manage environment variables exclusively through Vercel and Render dashboards.
+
+---
+
+## 7. API Health Check & Diagnostics
+
+The deployed backend exposes an authoritative health monitor at its root endpoint:
+
+```http
+GET https://budgetbuddy-sh3s.onrender.com/
+```
+
+### Example JSON Response
+
+```json
+{
+  "status": "online",
+  "message": "BudgetBuddy API Running",
+  "database": {
+    "mongooseReadyState": 1,
+    "isMongoConnected": true,
+    "mode": "MongoDB",
+    "host": "ac-av5q73l-shard-00-01.4am622d.mongodb.net",
+    "database": "budgetbuddy"
+  },
+  "emailConfigured": true,
+  "timestamp": "2026-09-12T19:12:47.177Z"
+}
+```
+
+### Field Definitions
+- **`status`**: `"online"` when the Express web application is running and responding.
+- **`message`**: Confirmation banner (`"BudgetBuddy API Running"`).
+- **`database`**: Real-time Mongoose connection telemetry confirming `readyState: 1` (`connected`), connection mode (`MongoDB`), cluster hostname, and active database name.
+- **`emailConfigured`**: `true` when SMTP transporter credentials are valid and verified.
+- **`timestamp`**: ISO-8601 UTC server timestamp.
+
+---
+
+## 8. Troubleshooting & Production Notes
+
+### 1. Frontend Cannot Connect to Server
+- **Symptom**: Network errors, login timeouts, or "Unable to connect to server" alerts.
+- **Resolution**:
+  1. Verify that `VITE_API_URL` in Vercel project settings is set to `https://budgetbuddy-sh3s.onrender.com/api` (including the `/api` subpath).
+  2. Redeploy the frontend in Vercel if you recently modified the variable, as Vite bakes environment variables into the static bundle at build time.
+
+### 2. CORS Errors in Browser Console
+- **Symptom**: `Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource...`
+- **Resolution**:
+  1. Inspect the `CLIENT_URL` environment variable on Render.
+  2. Ensure it exactly matches your deployed Vercel domain: `https://budgetbuddy-khaki-nine.vercel.app` (without trailing slashes or subpaths).
+  3. Restart the Render web service to apply environment variable updates.
+
+### 3. Render Cold Starts (Free Tier Spin-Down)
+- **Symptom**: The first API request after a period of inactivity takes 15–30 seconds.
+- **Resolution**: Render's free tier spins down idle instances after 15 minutes. When a new request arrives, Render automatically spins up the instance. Subsequent requests respond in milliseconds. If loading persists on your first visit, wait a few moments for the service to wake up.
+
+### 4. Avoiding Localhost URLs in Production
+- **Symptom**: Frontend attempts to call `http://localhost:5000` from the public internet.
+- **Resolution**: Ensure all production configurations use the deployed HTTPS domain names. Never set `VITE_API_URL` or `CLIENT_URL` to `localhost` in production deployment settings.
+
+---
+
+## 9. Key Features
 
 - **Robust Authentication & Account Security**:
   - Secure registration requiring full name, valid email, and password confirmation.
@@ -82,7 +297,7 @@ docs/screenshots/
 
 ---
 
-## 3. Tech Stack
+## 10. Tech Stack
 
 ### Frontend
 - **Framework**: [React 19](https://react.dev/)
@@ -92,6 +307,7 @@ docs/screenshots/
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Charts & Visualizations**: [Recharts v3](https://recharts.org/)
 - **Client-Side PDF Generation**: [jsPDF](https://github.com/parallax/jsPDF) & [jspdf-autotable](https://github.com/simonbengtsson/jsPDF-AutoTable)
+- **Deployment Platform**: [Vercel](https://vercel.com/)
 
 ### Backend
 - **Runtime**: [Node.js](https://nodejs.org/) (v20+ / v24 compatible)
@@ -100,6 +316,7 @@ docs/screenshots/
 - **Authentication**: [jsonwebtoken (JWT)](https://github.com/auth0/node-jsonwebtoken) & [bcryptjs](https://github.com/dcodeIO/bcrypt.js)
 - **Email Delivery**: [Nodemailer](https://nodemailer.com/) (Configured for Gmail SMTP / TLS)
 - **Security & Utilities**: CORS, Dotenv, Node.js Crypto
+- **Deployment Platform**: [Render](https://render.com/)
 
 ### Database
 - **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) (Cloud cluster with replica sets)
@@ -107,7 +324,7 @@ docs/screenshots/
 
 ---
 
-## 4. Application Screens
+## 11. Application Screens
 
 1. **Authentication (`/login`, `/register`, `/forgot-password`, `/reset-password`)**:
    - Clean dark-mode login form with password visibility toggle.
@@ -141,7 +358,7 @@ docs/screenshots/
 
 ---
 
-## 5. Project Structure
+## 12. Project Structure
 
 ```text
 Budgetbuddy/
@@ -226,18 +443,21 @@ Budgetbuddy/
 ├── docs/
 │   └── screenshots/                    # Application preview images
 ├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
 ---
 
-## 6. Installation & Setup
+## 13. Local Development & Setup
+
+If you wish to clone and run BudgetBuddy on your local machine:
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (version 20 or higher recommended)
+- [Node.js](https://nodejs.org/) (v20+ recommended)
 - [npm](https://www.npmjs.com/)
-- [MongoDB Atlas](https://www.mongodb.com/atlas) account (or local MongoDB running on `mongodb://127.0.0.1:27017`)
-- Gmail account with an [App Password](https://myaccount.google.com/apppasswords) (for real email OTPs)
+- [MongoDB Atlas](https://www.mongodb.com/atlas) cluster URI (or local MongoDB on `mongodb://127.0.0.1:27017`)
+- Gmail account with an [App Password](https://myaccount.google.com/apppasswords) (optional, for testing real email OTP dispatch)
 
 ### 1. Clone the Repository
 ```bash
@@ -246,95 +466,53 @@ cd budgetbuddy
 ```
 
 ### 2. Configure Backend Environment
-Navigate to the `backend/` directory and create your `.env` file:
 ```bash
 cd backend
 cp .env.example .env
 ```
-Edit `backend/.env` with your actual configuration:
+Fill in your local configuration in `backend/.env`:
 ```env
 PORT=5000
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/budgetbuddy
-JWT_SECRET=your_super_secret_random_jwt_key_here
+JWT_SECRET=your_development_jwt_secret_key
 CLIENT_URL=http://localhost:5173
 
-# Outbound Email Delivery (Nodemailer SMTP)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_SECURE=false
 EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_16_digit_gmail_app_password
+EMAIL_PASS=your_16_digit_app_password
 EMAIL_FROM="BudgetBuddy" <your_email@gmail.com>
 ```
 
-### 3. Install Backend Dependencies & Start Server
+### 3. Start Backend Server
 ```bash
 npm install
 npm run dev
 ```
-The backend will initialize on `http://localhost:5000`.
+The server will bind to `http://localhost:5000`.
 
 ### 4. Configure Frontend Environment
-In a new terminal, navigate to the `frontend/` directory:
+In a separate terminal:
 ```bash
 cd ../frontend
 cp .env.example .env
 ```
-Ensure `VITE_API_URL` points to your backend:
+Point `VITE_API_URL` to the local backend:
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-### 5. Install Frontend Dependencies & Start Dev Server
+### 5. Start Frontend Dev Server
 ```bash
 npm install
 npm run dev
 ```
-The frontend application will start on `http://localhost:5173`. Open this URL in your web browser.
+Open `http://localhost:5173` in your web browser.
 
 ---
 
-## 7. Environment Variables Reference
-
-| Variable | Description | Location | Default / Example |
-| :--- | :--- | :--- | :--- |
-| `PORT` | Backend server port | `backend/.env` | `5000` |
-| `MONGO_URI` | MongoDB Atlas or local connection string | `backend/.env` | `mongodb://127.0.0.1:27017/budgetbuddy` |
-| `JWT_SECRET` | Secret key used to sign and verify JWTs | `backend/.env` | `budgetbuddy_super_secret_jwt_key_2026` |
-| `CLIENT_URL` | Allowed frontend origin for CORS | `backend/.env` | `http://localhost:5173` |
-| `EMAIL_HOST` | SMTP server hostname | `backend/.env` | `smtp.gmail.com` |
-| `EMAIL_PORT` | SMTP port (587 for TLS, 465 for SSL) | `backend/.env` | `587` |
-| `EMAIL_SECURE` | Set `true` for port 465, `false` for 587 | `backend/.env` | `false` |
-| `EMAIL_USER` | Email address used for outbound messages | `backend/.env` | `your_email@gmail.com` |
-| `EMAIL_PASS` | 16-character Google App Password | `backend/.env` | `abcd efgh ijkl mnop` |
-| `EMAIL_FROM` | Sender display name and address | `backend/.env` | `"BudgetBuddy" <your_email@gmail.com>` |
-| `VITE_API_URL` | Frontend API base URL | `frontend/.env` | `http://localhost:5000/api` |
-
-> **Security Reminder**: Real credentials must only be stored in `.env` files. Both `backend/.env` and `frontend/.env` are strictly excluded from Git tracking via `.gitignore`.
-
----
-
-## 8. Application Walkthrough & Usage Flow
-
-1. **Sign Up & Account Activation**:
-   - Register at `/register`. An outbound 6-digit OTP is delivered to your email.
-   - Enter the code to activate your account.
-2. **Onboarding Setup**:
-   - Configure your initial Current Bank Balance (funds currently in your bank/cash).
-3. **Monthly Pocket Money Allocation**:
-   - When a new month begins, enter that month's pocket money. The entered amount credits directly to your bank balance.
-4. **Recording Expenses**:
-   - Record daily transactions under categories like Food, Travel, or Books.
-   - The system checks available funds, deducts from your bank balance, and updates analytics.
-5. **Monitoring Financial Health**:
-   - View your Dashboard to track pocket money usage and check whether your analysis basis is in Pocket Money mode or Total Bank Balance mode.
-6. **Generating Reports & Statements**:
-   - Open `/reports` to inspect the historical audit trail.
-   - Click **View** on any month to examine the detailed breakdown or click **Download PDF** to export an official statement.
-
----
-
-## 9. Security Implementation
+## 14. Security Implementation
 
 - **Password Hashing**: Passwords are encrypted using `bcryptjs` with auto-generated salt rounds before database persistence.
 - **Cryptographic OTPs & Tokens**: Verification codes and password reset tokens use Node.js `crypto` with SHA-256 hashing. Cleartext tokens are never stored in the database.
@@ -346,7 +524,7 @@ The frontend application will start on `http://localhost:5173`. Open this URL in
 
 ---
 
-## 10. Verification & Automated Testing
+## 15. Verification & Automated Testing
 
 BudgetBuddy includes a comprehensive 42-point automated verification suite testing all core functionality end-to-end:
 
@@ -369,7 +547,7 @@ node verify_budgetbuddy.js
 
 ---
 
-## 11. Application Preview Reference
+## 16. Application Preview Reference
 
 The GitHub README preview gallery showcases 6 high-resolution production views captured directly from the live application:
 - `login.png`: Dual-panel showcase featuring dark-theme credential sign-in and 6-digit email OTP verification.
@@ -381,7 +559,7 @@ The GitHub README preview gallery showcases 6 high-resolution production views c
 
 ---
 
-## 12. Future Improvements
+## 17. Future Improvements
 
 - **SMS / WhatsApp Alerts**: Optional low-balance notifications when pocket money reaches < 15%.
 - **Receipt Image Attachment**: Ability to upload photo receipts for hostel mess and canteen bills.
@@ -390,7 +568,7 @@ The GitHub README preview gallery showcases 6 high-resolution production views c
 
 ---
 
-## 13. Author
+## 18. Author
 
 **P. S. Prashanth**  
 - **GitHub**: [github.com/psprashanth25](https://github.com/psprashanth25)  
@@ -398,6 +576,6 @@ The GitHub README preview gallery showcases 6 high-resolution production views c
 
 ---
 
-## 14. License
+## 19. License
 
 This project is licensed under the [ISC License](LICENSE).
